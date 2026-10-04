@@ -4,3 +4,4 @@ venv/
 .venv
 cold-storage-logistics.pem
 Untitled-1.sql
+cache/

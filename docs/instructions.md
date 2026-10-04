@@ -83,3 +83,35 @@ docker run -v mssql_data:/var/opt/mssql \
 - https://app.pinecone.io/ > get api key
 - Use it in .env
 - run python scripts\ingest_sop_pinecone.py
+
+# Phase 2
+
+## Data Security
+
+- Click on file : scripts\setup_security_and_view.sql
+- VS-code will show you Start button directly on top else run like we were running the commands previously.
+- Once done, create a new connection now with Agent-Profile
+```
+* Profile Name: agent-fde-ro
+* Connection Group: Leave it on <Default>
+* Input type: Select Parameters (Do not click "Load from Connection String", "Browse Azure", or "Browse Fabric")
+* Server name*: localhost
+* Port: 1433
+* Trust server certificate: 🟩 Check this box / Turn it ON
+* Authentication type*: SQL Login
+* User name*: USR_FDE_RO
+* Password*: AgentPassword2026!
+* Save Password: 🟩 Check this box / Turn it ON
+* Database name: Type master (or click "Select a database" and select master)
+* Encrypt: Change this from Mandatory to Optional (or False)
+```
+
+Connect and test below commands :
+```
+-- TEST 1: This SHOULD work perfectly (Access to clean view)
+SELECT TOP 5 * FROM FDE_VIEWS.VW_ACTIVE_FLEET;
+
+-- TEST 2: This SHOULD fail instantly (Access to raw legacy table is DENIED)
+SELECT TOP 5 * FROM dbo.TBL_SC_FLEET_HIST_RAW;
+```
+
