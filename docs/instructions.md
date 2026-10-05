@@ -115,3 +115,19 @@ SELECT TOP 5 * FROM FDE_VIEWS.VW_ACTIVE_FLEET;
 SELECT TOP 5 * FROM dbo.TBL_SC_FLEET_HIST_RAW;
 ```
 
+## Phase 3
+
+run src\agent_tools.py
+run src\orchestrator.py
+
+Step-1 : Pass below in the dispatcher >
+- Question-1 (The "Domino Effect" Test)
+```
+Find any active shipments near Los Angeles (Latitude ~33.8, Longitude ~-118.1). Check the local weather there, and tell me if the current cargo temperature violates the SOP for fresh perishables.
+```
+
+- Question-2 (The "Restraint" Test (No-Tool Routing))
+```
+I'm a new dispatcher on the night shift. Can you quickly explain the difference between a Tier 1 and Tier 2 escalation?
+```
+
