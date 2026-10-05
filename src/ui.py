@@ -88,7 +88,7 @@ st.markdown("""
 if "thread_id" not in st.session_state:
     st.session_state.thread_id = str(uuid.uuid4())
 
-if "ui_messages" n  ot in st.session_state:
+if "ui_messages" not in st.session_state:
     st.session_state.ui_messages = []
 
 thread_config = {"configurable": {"thread_id": st.session_state.thread_id}}
