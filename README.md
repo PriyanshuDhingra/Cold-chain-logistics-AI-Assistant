@@ -169,11 +169,3 @@ scripts/             data ingestion
 src/                 agent, tools and Streamlit UI
 requirements.txt
 ```
-
-## Roadmap
-
-- [ ] Weather tool for route-level risk (the agent already degrades gracefully when a tool is unavailable)
-- [ ] Human-in-the-loop approval before the agent recommends a diversion
-- [ ] Sign-in for the Streamlit app
-- [ ] Infrastructure as code (Terraform) and a private subnet for the data node
-- [ ] An evaluation set of dispatcher questions with expected tool choices
