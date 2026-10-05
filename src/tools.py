@@ -18,6 +18,26 @@ project_root = script_dir.parent
 load_dotenv(dotenv_path=project_root / ".env")
 
 PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
+
+
+def get_cached_huggingface_embeddings(model_name: str):
+    """
+    Loads and locks the HuggingFace model weights into the machine's global RAM.
+    If called again during any subsequent script rerun, it returns instantly.
+    """
+    import streamlit as st
+    
+    # We wrap the inner call with st.cache_resource dynamically 
+    @st.cache_resource(show_spinner=False)
+    def _load_model(name: str):
+        print(f"🧠 MEMORY SEED: Permanently caching local model [{name}] in global RAM...")
+        from langchain_huggingface import HuggingFaceEmbeddings
+        return HuggingFaceEmbeddings(
+            model_name=name,
+            model_kwargs={'device': 'cpu'}
+        )
+    return _load_model(model_name)
+
 EMBEDDINGS_MODEL_SETTING = os.getenv("Embeddings_model", "LOCAL").strip().upper()
 
 db_host = os.getenv("SQL_SERVER_HOST", "localhost")
@@ -37,8 +57,17 @@ else :
     
     print(f"🤗 Mode: Connecting to Local Fallback [{local_model_target}] Index (1024 Dim Space)...")
 
-    from langchain_huggingface import HuggingFaceEmbeddings
-    embeddings = HuggingFaceEmbeddings(model_name=local_model_target, model_kwargs={'device': 'cpu'})
+    try:
+        import streamlit as st
+        if st.runtime.exists():
+            embeddings = get_cached_huggingface_embeddings(local_model_target)
+        else:
+            from langchain_huggingface import HuggingFaceEmbeddings
+            embeddings = HuggingFaceEmbeddings(model_name=local_model_target, model_kwargs={'device': 'cpu'})
+    except ImportError:
+        from langchain_huggingface import HuggingFaceEmbeddings
+        embeddings = HuggingFaceEmbeddings(model_name=local_model_target, model_kwargs={'device': 'cpu'})
+
     INDEX_NAME = "fde-sop-index-local"
 
 vector_store = PineconeVectorStore(index_name=INDEX_NAME, embedding=embeddings)
@@ -47,6 +76,7 @@ retriever = vector_store.as_retriever(search_kwargs={"k": 2})
 # ==========================================
 # 2. CORE AGENT TOOLS
 # ==========================================
+
 @tool
 def query_telemetry_db(sql_query: str) -> str:
     """
